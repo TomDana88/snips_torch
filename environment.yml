@@ -4,14 +4,14 @@ channels:
   - pytorch
   - conda-forge
 dependencies:
-  - python=3.7.7
-  - pytorch=1.7.0
+  - python
+  - pytorch
   - scipy
   - torchvision
   - hdf5
   - tqdm
   - h5py
-  - cudatoolkit=11.0
+  - cudatoolkit
   - pyyaml
   - numpy
   - tensorboard
