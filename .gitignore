@@ -1,6 +1,8 @@
 *.gif
 *.pdf
-exp/
+exp/logs
+exp/__MACOSX
+exp/image_samples
 .idea/
 __pycache__
 .vscode/
