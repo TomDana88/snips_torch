@@ -4,3 +4,5 @@ exp/
 .idea/
 __pycache__
 .vscode/
+celeba.zip
+datasets.zip

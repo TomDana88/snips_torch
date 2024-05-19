@@ -56,10 +56,10 @@ def parse_args_and_config():
     if not os.path.exists(args.image_folder):
         os.makedirs(args.image_folder)
     else:
-        response = input("Image folder already exists. Overwrite? (Y/N)")
-        if response.upper() == 'Y':
-            overwrite = True
-
+        # response = input("Image folder already exists. Overwrite? (Y/N)")
+        # if response.upper() == 'Y':
+        #     overwrite = True
+        overwrite = True
         if overwrite:
             shutil.rmtree(args.image_folder)
             os.makedirs(args.image_folder)
