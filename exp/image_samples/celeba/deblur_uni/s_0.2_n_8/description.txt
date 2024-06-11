@@ -1,0 +1,21 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: info
+image_folder: exp/image_samples/celeba/deblur_uni/s_0.2_n_8
+num_variations: 8
+sigma_0: 0.2
+degradation: deblur_uni
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.005227021872997284, 23.06209373474121
+MSE/PSNR of the general #1: 0.005292968358844519, 22.966779708862305
+MSE/PSNR of the general #2: 0.005118638277053833, 23.15350341796875
+MSE/PSNR of the general #3: 0.005168728064745665, 23.075014114379883
+MSE/PSNR of the general #4: 0.005415668711066246, 22.984941482543945
+MSE/PSNR of the general #5: 0.005253686103969812, 23.13483428955078
+MSE/PSNR of the general #6: 0.005174242425709963, 23.10419464111328
+MSE/PSNR of the general #7: 0.0052683185786008835, 23.065364837646484
+MSE/PSNR of the mean: 0.003097855718806386, 25.316940307617188
