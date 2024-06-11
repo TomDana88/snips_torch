@@ -1,0 +1,6 @@
+degradation: cs8
+n: 3
+MSE/PSNR of the general #0: 0.005962, 22.245964
+MSE/PSNR of the general #1: 0.004980, 23.027519
+MSE/PSNR of the general #2: 0.006198, 22.077236
+MSE/PSNR of the mean: 0.003878, 24.114178

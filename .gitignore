@@ -1,8 +1,8 @@
 *.gif
 *.pdf
+exp/datasets/celeba/img_align_celeba
 exp/logs
 exp/__MACOSX
-exp/image_samples
 .idea/
 __pycache__
 .vscode/

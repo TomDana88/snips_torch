@@ -1,0 +1,14 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: all sigmas
+verbose: info
+image_folder: exp\image_samples\celeba_deg_cs16_n_1_full
+num_variations: 1
+sigma_0: 0.1
+degradation: cs16
+log_path: exp\logs\celeba
+log_sample_path: exp\logs\celeba\samples
+MSE/PSNR of the general #0: 0.01654891110956669, 17.812305450439453
+MSE/PSNR of the mean: 0.01654891110956669, 17.812305450439453
