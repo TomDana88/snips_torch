@@ -18,7 +18,7 @@ __all__ = ["NCSNRunner"]
 
 
 def get_model(config):
-    if config.data.dataset == "CELEBA":
+    if config.data.dataset in ["CELEBA", "IMAGENET"]:
         return NCSNv2(config).to(config.device)
     elif config.data.dataset == "LSUN":
         return NCSNv2Deeper(config).to(config.device)
@@ -299,7 +299,7 @@ class NCSNRunner:
             dataset,
             batch_size=self.config.sampling.batch_size,
             shuffle=True,
-            num_workers=4,
+            num_workers=0,
         )
 
         score.eval()

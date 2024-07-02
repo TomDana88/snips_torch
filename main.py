@@ -38,7 +38,7 @@ def parse_args_and_config():
         config = yaml.safe_load(f)
     new_config = dict2namespace(config)
 
-    tb_path = os.path.join(args.exp, 'tensorboard', args.doc)
+    # tb_path = os.path.join(args.exp, 'tensorboard', args.doc)
 
     level = getattr(logging, args.verbose.upper(), None)
     if not isinstance(level, int):

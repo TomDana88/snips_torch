@@ -3,6 +3,7 @@ import torch
 import torchvision.transforms as transforms
 from torchvision.datasets import LSUN
 from datasets.celeba import CelebA
+from datasets.imagenet import IMAGENET
 from torch.utils.data import Subset
 import numpy as np
 
@@ -50,6 +51,13 @@ def get_dataset(args, config):
                                  transforms.CenterCrop(config.data.image_size),
                                  transforms.ToTensor(),
                              ]))
+    elif config.data.dataset == 'IMAGENET':
+        dataset = IMAGENET(root=os.path.join(args.exp, 'datasets', 'imagenet'),
+                           transform=transforms.Compose([
+                                transforms.Resize((config.data.image_size, config.data.image_size)),
+                                transforms.CenterCrop(config.data.image_size),
+                                transforms.ToTensor(),
+                           ]))
 
     return dataset
 
