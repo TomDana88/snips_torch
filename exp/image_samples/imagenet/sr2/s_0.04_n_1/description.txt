@@ -1,0 +1,14 @@
+config: imagenet.yml
+seed: 1234
+exp: exp
+doc: imagenet
+comment: 
+verbose: info
+image_folder: exp/image_samples/imagenet/sr2/s_0.04_n_1
+num_variations: 1
+sigma_0: 0.04
+degradation: sr2
+log_path: exp/logs/imagenet
+log_sample_path: exp/logs/imagenet/samples
+MSE/PSNR of the general #0: 0.002803822746500373, 25.863075256347656
+MSE/PSNR of the mean: 0.002803822746500373, 25.863075256347656

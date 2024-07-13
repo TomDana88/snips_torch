@@ -1,0 +1,23 @@
+config: imagenet.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: info
+image_folder: exp/image_samples/imagenet/sr2/s_0.2_n_10
+num_variations: 10
+sigma_0: 0.2
+degradation: sr2
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.009251807816326618, 20.40628433227539
+MSE/PSNR of the general #1: 0.008833277970552444, 20.609508514404297
+MSE/PSNR of the general #2: 0.009182319976389408, 20.470909118652344
+MSE/PSNR of the general #3: 0.008632765151560307, 20.703838348388672
+MSE/PSNR of the general #4: 0.008650518953800201, 20.665390014648438
+MSE/PSNR of the general #5: 0.009163164533674717, 20.502460479736328
+MSE/PSNR of the general #6: 0.0087064728140831, 20.669748306274414
+MSE/PSNR of the general #7: 0.009128158912062645, 20.422119140625
+MSE/PSNR of the general #8: 0.008758640848100185, 20.666318893432617
+MSE/PSNR of the general #9: 0.008868002332746983, 20.604305267333984
+MSE/PSNR of the mean: 0.005452204030007124, 22.749351501464844
