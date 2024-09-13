@@ -1,5 +1,5 @@
 # Digital Image Processing: Final Project
-## Tom Dana and <Fayrouz ?>
+## Tom Dana and Fayrouz Azem
 
 ## Paper: [SNIPS: Solving Noisy Inverse Problems Stochastically](http://arxiv.org/abs/2105.14951) by Bahjat Kawar, Gregory Vaksman, and Michael Elad
 
