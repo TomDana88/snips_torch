@@ -1,0 +1,19 @@
+name: snips
+channels:
+  - defaults
+  - pytorch
+  - conda-forge
+dependencies:
+  - python
+  - pytorch
+  - scipy
+  - torchvision
+  - hdf5
+  - tqdm
+  - h5py
+  - cudatoolkit
+  - pyyaml
+  - numpy
+  - tensorboard
+  - pandas
+  - python-lmdb

@@ -1,0 +1,24 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/celeba/salt_and_pepper/cs4
+num_variations: 8
+sigma_0: 0.1
+degradation: cs4
+noise_type: salt_and_pepper
+num_samples: 0
+overwrite: True
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.011095740832388401, 20.008071899414062
+MSE/PSNR of the general #1: 0.010477366857230663, 20.275239944458008
+MSE/PSNR of the general #2: 0.010670389980077744, 20.23878288269043
+MSE/PSNR of the general #3: 0.010850937105715275, 20.12823486328125
+MSE/PSNR of the general #4: 0.010822308249771595, 20.162673950195312
+MSE/PSNR of the general #5: 0.010952838696539402, 20.059865951538086
+MSE/PSNR of the general #6: 0.011031538248062134, 20.02555274963379
+MSE/PSNR of the general #7: 0.010701348073780537, 20.220293045043945
+MSE/PSNR of the mean: 0.00913220178335905, 21.0228214263916

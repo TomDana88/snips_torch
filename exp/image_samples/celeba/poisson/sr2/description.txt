@@ -1,0 +1,24 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/celeba/poisson/sr2
+num_variations: 8
+sigma_0: 0.1
+degradation: sr2
+noise_type: poisson
+num_samples: 0
+overwrite: True
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.00238419440574944, 26.32877540588379
+MSE/PSNR of the general #1: 0.002355587435886264, 26.377391815185547
+MSE/PSNR of the general #2: 0.002370591275393963, 26.375926971435547
+MSE/PSNR of the general #3: 0.0023258894216269255, 26.513225555419922
+MSE/PSNR of the general #4: 0.0024035971146076918, 26.30318832397461
+MSE/PSNR of the general #5: 0.0023380073253065348, 26.408140182495117
+MSE/PSNR of the general #6: 0.0023296112194657326, 26.40262222290039
+MSE/PSNR of the general #7: 0.0023126353044062853, 26.48237419128418
+MSE/PSNR of the mean: 0.0012389306211844087, 29.174217224121094

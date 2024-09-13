@@ -1,17 +1,13 @@
-#import sys
-#import os
-#from main import main
 import subprocess
 
-
 def test_main():
-    N = 10
-    for deg in ['inp', 'deublur_gauss', 'delur_uni', 'cs4', 'cs8', 'cs16', 'sr2', 'sr4']:
-        for s in [0.2, 0.1, 0.04]:
-            print(f"*** RUNNING '{deg}' TEST WITH s={s} ***", flush=True)
-            image_folder = f'imagenet/{deg}/s_{s}_n_{N}'
-            args = ['python', 'main.py', '--doc', 'celeba', '--config', 'imagenet.yml', '--degradation', deg, '-i', image_folder, '-n', str(N), '-s', str(s)]
-            subprocess.run(args) 
+    N = 8
+    NOISE_TYPE = 'speckle'
+    for deg in ['cs8']:
+        print(f"*** RUNNING '{deg}' with noise={NOISE_TYPE} ***", flush=True)
+        image_folder = f'celeba/speckle/{deg}'
+        args = f'python main.py --config celeba.yml --doc celeba -d {deg} -i {image_folder} -n 8 --noise_type {NOISE_TYPE} --overwrite --verbose error'
+        subprocess.run(args.split())
 
 
 if __name__ == '__main__':

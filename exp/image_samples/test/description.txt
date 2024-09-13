@@ -1,0 +1,15 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/test
+num_variations: 1
+sigma_0: 0.1
+degradation: color
+num_samples: 1
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.07377778738737106, 11.320743560791016
+MSE/PSNR of the mean: 0.07377778738737106, 11.320743560791016

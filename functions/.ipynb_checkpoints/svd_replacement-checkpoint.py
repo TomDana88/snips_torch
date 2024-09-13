@@ -84,7 +84,7 @@ class GeneralH(H_functions):
 
         ZERO = 1e-3
         self._singulars[self._singulars < ZERO] = 0
-        print(len([x.item() for x in self._singulars if x == 0]))
+        # print(len([x.item() for x in self._singulars if x == 0]))
 
     def V(self, vec):
         return self.mat_by_vec(self._V, vec.clone())
@@ -107,7 +107,7 @@ class GeneralH(H_functions):
         return out
 
 #Inpainting
-class Inpainting(H_functions):
+class Inpainting(GeneralH):
     def __init__(self, channels, img_dim, missing_indices, device):
         self.channels = channels
         self.img_dim = img_dim
@@ -458,7 +458,7 @@ class Deblurring(H_functions):
         return temp.reshape(vec.shape[0], -1)
 
     def singulars(self):
-        return self._singulars.repeat(1, 3).reshape(-1)
+        return self._singulars.repeat(1, self.channels).reshape(-1)
 
     def add_zeros(self, vec):
         return vec.clone().reshape(vec.shape[0], -1)
@@ -536,7 +536,7 @@ class Deblurring2D(H_functions):
         return temp.reshape(vec.shape[0], -1)
 
     def singulars(self):
-        return self._singulars.repeat(1, 3).reshape(-1)
+        return self._singulars.repeat(1, self.channels).reshape(-1)
 
     def add_zeros(self, vec):
         return vec.clone().reshape(vec.shape[0], -1)

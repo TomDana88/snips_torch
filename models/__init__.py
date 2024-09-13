@@ -19,7 +19,8 @@ def get_sigmas(config):
 
 def mat_by_vec(M, v):
     vshape = v.shape[2]
-    if len(v.shape) > 3: vshape = vshape * v.shape[3]
+    if len(v.shape) > 3:
+        vshape = vshape * v.shape[3]
     return torch.matmul(M, v.view(v.shape[0] * v.shape[1], vshape,
                     1)).view(v.shape[0], v.shape[1], M.shape[0])
 
@@ -34,19 +35,35 @@ def invert_diag(M):
 
 @torch.no_grad()
 def general_anneal_Langevin_dynamics(H, y_0, x_mod, scorenet, sigmas, n_steps_each=200, step_lr=0.000008,
-                             final_only=False, verbose=False, denoise=True, c_begin = 0, sigma_0 = 1):
+                                     final_only=False, verbose=False, denoise=True, c_begin=0, sigma_0=1):
+    # H = H_funcs.H(x_mod)
     U, singulars, V = torch.svd(H, some=False)
+    #print(f"H.shape: {H.shape}")
+    # print(f"U.shape: {U.shape}")
+    # print(f"singulars.shape: {singulars.shape}")
+    # print(f"V.shape: {V.shape}")
+    # quit()
     V_t = V.transpose(0, 1)
 
     ZERO = 1e-3
     singulars[singulars < ZERO] = 0
 
     Sigma = torch.zeros_like(H)
-    for i in range(singulars.shape[0]): Sigma[i, i] = singulars[i]
+    for i in range(singulars.shape[0]):
+        Sigma[i, i] = singulars[i]
+    # ***
+    # singulars = H_funcs.singulars()
+    # Sigma = torch.zeros(x_mod.shape[1] * x_mod.shape[2] * x_mod.shape[3], device=x_mod.device)
+    # Sigma[:singulars.shape[0]] = singulars
+    # ***
+
     S_1, S_n = singulars[0], singulars[-1]
 
     S_S_t = torch.zeros_like(U)
-    for i in range(singulars.shape[0]): S_S_t[i, i] = singulars[i] ** 2
+    #print(f"S_S_t.shape: {S_S_t.shape}")
+    #print(f"singulars.shape: {singulars.shape}")
+    for i in range(singulars.shape[0]):
+        S_S_t[i, i] = singulars[i] ** 2
 
     num_missing = V.shape[0] - torch.count_nonzero(singulars)
 
@@ -54,6 +71,10 @@ def general_anneal_Langevin_dynamics(H, y_0, x_mod, scorenet, sigmas, n_steps_ea
 
     V_t_x = mat_by_vec(V_t, x_mod)
     U_t_y = mat_by_vec(U.transpose(0,1), y_0)
+    # ***
+    # V_t_x = H_funcs.Vt(x_mod)
+    # U_t_y = H_funcs.Ut(y_0)
+    # ***
 
     img_dim = x_mod.shape[2]
 
@@ -80,6 +101,7 @@ def general_anneal_Langevin_dynamics(H, y_0, x_mod, scorenet, sigmas, n_steps_ea
             for s in range(n_steps_each):
                 grad = torch.zeros_like(V_t_x)
                 score = mat_by_vec(V_t, scorenet(x_mod, labels))
+                # score = H_funcs.Vt(scorenet(x_mod, labels))
 
                 diag_mat = S_S_t * (sigma ** 2) - s0_2_I
                 diag_mat[cond_after_lite, cond_after_lite] = diag_mat[cond_after_lite, cond_after_lite] * (-1)
@@ -95,6 +117,7 @@ def general_anneal_Langevin_dynamics(H, y_0, x_mod, scorenet, sigmas, n_steps_ea
                 noise = torch.randn_like(V_t_x)
                 V_t_x = V_t_x + step_vector * grad + noise * torch.sqrt(step_vector * 2)
                 x_mod = vec_to_image(mat_by_vec(V, V_t_x), img_dim)
+                # x_mod = vec_to_image(H_funcs.V(V_t_x), img_dim)
 
                 if not final_only:
                     images.append(x_mod.to('cpu'))

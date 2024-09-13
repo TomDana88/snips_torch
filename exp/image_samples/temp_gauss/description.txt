@@ -1,0 +1,17 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/temp_gauss
+num_variations: 1
+sigma_0: 0.1
+degradation: sr4
+noise_type: gaussian
+num_samples: 0
+overwrite: True
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.007492224220186472, 21.40468406677246
+MSE/PSNR of the mean: 0.007492224220186472, 21.40468406677246

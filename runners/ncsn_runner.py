@@ -13,6 +13,7 @@ from models import general_anneal_Langevin_dynamics
 from models import get_sigmas
 from models.ema import EMAHelper
 from filter_builder import get_custom_kernel
+from skimage.util import random_noise
 
 __all__ = ["NCSNRunner"]
 
@@ -28,12 +29,12 @@ class NCSNRunner:
     def __init__(self, args, config):
         self.args = args
         self.config = config
+        self.channels = config.data.channels
+        self.image_size = config.data.image_size
         args.log_sample_path = os.path.join(args.log_path, "samples")
         os.makedirs(args.log_sample_path, exist_ok=True)
 
-    def sample_general(
-        self, score, samples, init_samples, sigma_0, sigmas, num_variations=1, deg="sr4"
-    ):
+    def sample_general(self, score, samples, init_samples, sigma_0, sigmas, num_variations=8, deg="sr4", noise_type="gaussian"):
         ## show stochastic variation ##
         stochastic_variations = torch.zeros(
             (4 + num_variations) * self.config.sampling.batch_size,
@@ -49,7 +50,8 @@ class NCSNRunner:
             self.config.data.image_size,
         )
         sample = inverse_data_transform(self.config, clean)
-        stochastic_variations[0 : self.config.sampling.batch_size, :, :, :] = sample
+        stochastic_variations[0: self.config.sampling.batch_size,
+                              :, :, :] = sample
 
         img_dim = self.config.data.image_size**2
 
@@ -57,22 +59,15 @@ class NCSNRunner:
         H = 0
         if deg[:2] == "cs":
             ## random with set singular values ##
+            from functions.svd_replacement import WalshHadamardCS
             compress_by = int(deg[2:])
             Vt = torch.rand(img_dim, img_dim).to(self.config.device)
             Vt, _ = torch.linalg.qr(Vt, mode="complete")
-            U = torch.rand(img_dim // compress_by, img_dim // compress_by).to(
-                self.config.device
-            )
+            U = torch.rand(img_dim // compress_by, img_dim //
+                           compress_by).to(self.config.device)
             U, _ = torch.linalg.qr(U, mode="complete")
-            S = torch.hstack(
-                (
-                    torch.eye(img_dim // compress_by),
-                    torch.zeros(
-                        img_dim // compress_by,
-                        (compress_by - 1) * img_dim // compress_by,
-                    ),
-                )
-            ).to(self.config.device)
+            S = torch.hstack((torch.eye(img_dim // compress_by), torch.zeros(img_dim //
+                             compress_by, (compress_by-1) * img_dim // compress_by))).to(self.config.device)
             H = torch.matmul(U, torch.matmul(S, Vt))
         elif deg == "inp":
             ## crop ##
@@ -80,54 +75,48 @@ class NCSNRunner:
             H = H[: -(self.config.data.image_size * 20), :]
         elif deg == "deblur_uni":
             ## blur ##
-            H = (
-                torch.from_numpy(
-                    get_custom_kernel(type="uniform", dim=self.config.data.image_size)
-                )
-                .type(torch.FloatTensor)
-                .to(self.config.device)
-            )
+            H = torch.from_numpy(get_custom_kernel(type="uniform", dim=self.config.data.image_size)).type(
+                torch.FloatTensor).to(self.config.device)
         elif deg == "deblur_gauss":
             ## blur ##
-            H = (
-                torch.from_numpy(
-                    get_custom_kernel(type="gauss", dim=self.config.data.image_size)
-                )
-                .type(torch.FloatTensor)
-                .to(self.config.device)
-            )
+            H = torch.from_numpy(get_custom_kernel(type="gauss", dim=self.config.data.image_size)).type(
+                torch.FloatTensor).to(self.config.device)
         elif deg[:2] == "sr":
             ## downscale - super resolution ##
             blur_by = int(deg[2:])
-            H = torch.zeros((img_dim // (blur_by**2), img_dim)).to(self.config.device)
+            H = torch.zeros((img_dim // (blur_by**2), img_dim)
+                            ).to(self.config.device)
             for i in range(self.config.data.image_size // blur_by):
                 for j in range(self.config.data.image_size // blur_by):
                     for i_inc in range(blur_by):
                         for j_inc in range(blur_by):
-                            H[
-                                i * self.config.data.image_size // blur_by + j,
-                                (blur_by * i + i_inc) * self.config.data.image_size
-                                + (blur_by * j + j_inc),
-                            ] = (
-                                1 / blur_by**2
-                            )
+                            H[i * self.config.data.image_size // blur_by + j,
+                                (blur_by * i + i_inc) * self.config.data.image_size + (blur_by * j + j_inc)] = 1 / blur_by ** 2
         else:
             print("ERROR: degradation type not supported")
             quit()
 
         ## set up input for the problem ##
-        y_0 = torch.matmul(
-            H, samples.view(samples.shape[0] * self.config.data.channels, img_dim, 1)
-        ).view(samples.shape[0], self.config.data.channels, H.shape[0])
-        y_0 = y_0 + sigma_0 * torch.randn_like(y_0)
+        if (noise_type == "poisson"):
+            samples = torch.poisson(samples * 255.0) / 255.0
+        y_0 = torch.matmul(H, samples.view(samples.shape[0] * self.config.data.channels, img_dim, 1)).view(
+            samples.shape[0], self.config.data.channels, H.shape[0])
+        if noise_type == "gaussian":
+            y_0 = y_0 + sigma_0 * torch.randn_like(y_0)
+        elif noise_type == "salt_and_pepper":
+            y_0 = torch.from_numpy(random_noise(y_0.cpu().numpy(
+            ), mode="s&p", amount=self.args.sp_amount)).float().to(self.config.device)
+        elif noise_type == "speckle":
+            y_0 = torch.from_numpy(random_noise(y_0.cpu().numpy(
+            ), mode="speckle", var=sigma_0 ** 2)).float().to(self.config.device)
+
         torch.save(y_0, os.path.join(self.args.image_folder, "y_0.pt"))
 
         H_t = H.transpose(0, 1)
         H_cross = torch.matmul(H_t, torch.inverse(torch.matmul(H, H_t)))
-        pinv_y_0 = torch.matmul(
-            H_cross,
-            y_0.view(samples.shape[0] * self.config.data.channels, H.shape[0], 1),
-        )
+        pinv_y_0 = torch.matmul(H_cross, y_0.view(
+            samples.shape[0] * self.config.data.channels, H.shape[0], 1))
+
         if deg == "deblur_uni" or deg == "deblur_gauss":
             pinv_y_0 = y_0
         sample = inverse_data_transform(
@@ -140,7 +129,7 @@ class NCSNRunner:
             ),
         )
         stochastic_variations[
-            1 * self.config.sampling.batch_size : 2 * self.config.sampling.batch_size,
+            1 * self.config.sampling.batch_size: 2 * self.config.sampling.batch_size,
             :,
             :,
             :,
@@ -163,19 +152,16 @@ class NCSNRunner:
                 sigma_0=sigma_0,
             )
 
-            sample = (
-                all_samples[-1]
-                .view(
-                    all_samples[-1].shape[0],
-                    self.config.data.channels,
-                    self.config.data.image_size,
-                    self.config.data.image_size,
-                )
-                .to(self.config.device)
-            )
+            sample = all_samples[-1].view(
+                all_samples[-1].shape[0],
+                self.config.data.channels,
+                self.config.data.image_size,
+                self.config.data.image_size,
+            ).to(self.config.device)
+
             stochastic_variations[
-                (self.config.sampling.batch_size)
-                * (i + 2) : (self.config.sampling.batch_size)
+                self.config.sampling.batch_size
+                * (i + 2): self.config.sampling.batch_size
                 * (i + 3),
                 :,
                 :,
@@ -184,8 +170,8 @@ class NCSNRunner:
 
         ## calculate mean and std ##
         runs = stochastic_variations[
-            (self.config.sampling.batch_size)
-            * (2) : (self.config.sampling.batch_size)
+            self.config.sampling.batch_size
+            * 2: self.config.sampling.batch_size
             * (2 + num_variations),
             :,
             :,
@@ -200,34 +186,33 @@ class NCSNRunner:
         )
 
         stochastic_variations[
-            (self.config.sampling.batch_size)
-            * (-2) : (self.config.sampling.batch_size)
-            * (-1),
+            self.config.sampling.batch_size
+            * -2: self.config.sampling.batch_size
+            * -1,
             :,
             :,
             :,
         ] = torch.mean(runs, dim=0)
-        stochastic_variations[(self.config.sampling.batch_size) * (-1) :, :, :, :] = (
-            torch.std(runs, dim=0)
-        )
+        stochastic_variations[(self.config.sampling.batch_size)
+                              * (-1):, :, :, :] = torch.std(runs, dim=0)
 
-        torch.save(
-            stochastic_variations, os.path.join(self.args.image_folder, "results.pt")
-        )
+        torch.save(stochastic_variations, os.path.join(
+            self.args.image_folder, "results.pt"))
 
-        image_grid = make_grid(stochastic_variations, self.config.sampling.batch_size)
-        save_image(
-            image_grid, os.path.join(self.args.image_folder, "stochastic_variation.png")
-        )
+        image_grid = make_grid(stochastic_variations,
+                               self.config.sampling.batch_size)
+        save_image(image_grid, os.path.join(
+            self.args.image_folder, "stochastic_variation.png"))
 
         ## report PSNRs ##
         clean = stochastic_variations[
-            0 * self.config.sampling.batch_size : 1 * self.config.sampling.batch_size,
+            0 * self.config.sampling.batch_size: 1 * self.config.sampling.batch_size,
             :,
             :,
             :,
         ]
-        out_file = open(os.path.join(self.args.image_folder, "description.txt"), "w")
+        out_file = open(os.path.join(
+            self.args.image_folder, "description.txt"), "w")
         try:
             for k, v in vars(self.args).items():
                 out_file.write(f"{k}: {v}\n")
@@ -236,21 +221,22 @@ class NCSNRunner:
         for i in range(num_variations):
             general = stochastic_variations[
                 (2 + i)
-                * self.config.sampling.batch_size : (3 + i)
+                * self.config.sampling.batch_size: (3 + i)
                 * self.config.sampling.batch_size,
                 :,
                 :,
                 :,
             ]
             mse = torch.mean((general - clean) ** 2)
-            instance_mse = ((general - clean) ** 2).view(general.shape[0], -1).mean(1)
+            instance_mse = ((general - clean) **
+                            2).view(general.shape[0], -1).mean(1)
             psnr = torch.mean(10 * torch.log10(1 / instance_mse))
             print("MSE/PSNR of the general #%d: %f, %f" % (i, mse, psnr))
             out_file.write(f"MSE/PSNR of the general #{i}: {mse}, {psnr}\n")
 
         mean = stochastic_variations[
             (2 + num_variations)
-            * self.config.sampling.batch_size : (3 + num_variations)
+            * self.config.sampling.batch_size: (3 + num_variations)
             * self.config.sampling.batch_size,
             :,
             :,
@@ -268,15 +254,12 @@ class NCSNRunner:
         if self.config.sampling.ckpt_id is None:
             states = torch.load(
                 os.path.join(self.args.log_path, "checkpoint.pth"),
-                map_location=self.config.device,
-            )
+                map_location=self.config.device)
         else:
             states = torch.load(
-                os.path.join(
-                    self.args.log_path, f"checkpoint_{self.config.sampling.ckpt_id}.pth"
-                ),
-                map_location=self.config.device,
-            )
+                os.path.join(self.args.log_path,
+                             f"checkpoint_{self.config.sampling.ckpt_id}.pth"),
+                map_location=self.config.device)
 
         score = get_model(self.config)
         score = torch.nn.DataParallel(score)
@@ -318,4 +301,5 @@ class NCSNRunner:
             sigmas,
             num_variations=self.args.num_variations,
             deg=self.args.degradation,
+            noise_type=self.args.noise_type
         )

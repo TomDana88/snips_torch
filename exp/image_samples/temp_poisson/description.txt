@@ -1,0 +1,17 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/temp_poisson
+num_variations: 1
+sigma_0: 0.1
+degradation: sr4
+noise_type: poisson
+num_samples: 0
+overwrite: True
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.006208455190062523, 22.227807998657227
+MSE/PSNR of the mean: 0.006208455190062523, 22.227807998657227

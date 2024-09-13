@@ -1,0 +1,25 @@
+config: celeba.yml
+seed: 1234
+exp: exp
+doc: celeba
+comment: 
+verbose: error
+image_folder: exp/image_samples/celeba/speckle/cs4
+num_variations: 8
+sigma_0: 0.1
+sp_amount: 0.05
+degradation: cs4
+noise_type: speckle
+num_samples: 0
+overwrite: True
+log_path: exp/logs/celeba
+log_sample_path: exp/logs/celeba/samples
+MSE/PSNR of the general #0: 0.006191169377416372, 23.17444610595703
+MSE/PSNR of the general #1: 0.006403143052011728, 23.169570922851562
+MSE/PSNR of the general #2: 0.006174437701702118, 23.161373138427734
+MSE/PSNR of the general #3: 0.005968472454696894, 23.369037628173828
+MSE/PSNR of the general #4: 0.006128468085080385, 23.120075225830078
+MSE/PSNR of the general #5: 0.00641351705417037, 22.925209045410156
+MSE/PSNR of the general #6: 0.006228918209671974, 23.103546142578125
+MSE/PSNR of the general #7: 0.006070252973586321, 23.211851119995117
+MSE/PSNR of the mean: 0.004382527898997068, 25.034929275512695
