@@ -17,7 +17,7 @@ conda create --name <env> --file requirements.txt
 
 ### Project structure
 
-`main.py` is the file that you should run for both training and sampling. Execute ```python main.py --help``` to get its usage description:
+`main.py` is the file that you should run for sampling. Execute ```python main.py --help``` to get its usage description:
 
 ```
 usage: main.py [-h] [--config CONFIG] [--seed SEED] [--exp EXP] [--doc DOC] [--comment COMMENT] [--verbose VERBOSE] [-i IMAGE_FOLDER] [-n NUM_VARIATIONS] [-s SIGMA_0] [--sp_amount AMOUNT] [-d DEG] [--noise_type NOISE]
@@ -57,9 +57,9 @@ Configuration files are in `config/`. You don't need to include the prefix `conf
 ├── datasets # all dataset files
 │   ├── celeba # all CelebA files
 │   └── lsun # all LSUN files
-├── logs # contains checkpoints and samples produced during training
+├── logs # contains models checkpoints
 │   └── <doc> # a folder named by the argument `--doc` specified to main.py
-│      └── checkpoint_x.pth # the checkpoint file saved at the x-th training iteration
+│      └── checkpoint_x.pth # the checkpoint file will be used
 ├── image_samples # contains generated samples
 │   └── <i>
 │       ├── stochastic_variation.png # samples generated from checkpoint_x.pth, including original, degraded, mean, and std   
@@ -88,7 +88,7 @@ The available degradations are: Inpainting (`inp`), Uniform deblurring (`deblur_
 
 Link: https://drive.google.com/drive/folders/1217uhIvLg9ZrYNKOR3XTRFSurt4miQrd?usp=sharing
 
-These checkpoint files are provided as-is from the authors of [NCSNv2](https://github.com/ermongroup/ncsnv2). You can use the CelebA, LSUN-bedroom, and LSUN-tower datasets' pretrained checkpoints. We assume the `--exp` argument is set to `exp`.
+These checkpoint files are provided as-is from the authors of [NCSNv2](https://github.com/ermongroup/ncsnv2). You can use the CelebA, LSUN-bedroom, and LSUN-tower datasets' pretrained checkpoints. We assume the `--exp` argument is set to `exp`. The checkpoint needs to be located at `<exp>/logs/<doc>/`, e.g. `exp/logs/celeba/checkpoint_210000.pth` for the CelebA dataset.
 
 ## Acknowledgement
 
