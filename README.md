@@ -65,7 +65,7 @@ Configuration files are in `config/`. You don't need to include the prefix `conf
 │       ├── stochastic_variation.png # samples generated from checkpoint_x.pth, including original, degraded, mean, and std   
 │       ├── results.pt # the pytorch tensor corresponding to stochastic_variation.png
 │       ├── y_0.pt # the pytorch tensor containing the input y of SNIPS
-|       └── description.txt # text file with all of the experiment's configs and results
+│       └── description.txt # text file with all of the experiment's configs and results
 ```
 
 ### Downloading data
