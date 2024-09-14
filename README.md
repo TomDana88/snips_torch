@@ -68,6 +68,14 @@ Configuration files are in `config/`. You don't need to include the prefix `conf
 │       └── description.txt # text file with all of the experiment's configs and results
 ```
 
+The file `runners/ncsn_runner.py` implements the high level pipeline of generating samples - getting the raw images, applying degradation and adding noise, calling a function to get the output samples and saving them.
+
+The `models` module implements the `NCSNv2` Unet model used in the algorithm, and the `general_anneal_Langevin_dynamics()` function which holds the main logic for generating samples given a degraded image `y_0` and degradation operator `H`.
+
+The `datasets` modules implements the handling of different datasets.
+
+The `filter_builder.py` file used to generate uniform and gaussian deblurring kernels.
+
 ### Downloading data
 
 You can download the aligned and cropped CelebA files from their official source [here](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html). The LSUN files can be downloaded using [this script](https://github.com/fyu/lsun). For our purposes, only the validation sets of LSUN bedroom and tower need to be downloaded.
